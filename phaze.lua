@@ -1277,96 +1277,69 @@ function Menu.DrawLoadingBar(alpha)
         screenHeight = Susano.GetScreenHeight()
     end
 
+    local barWidth = 300
+    local barHeight = 8
     local centerX = screenWidth / 2
-    local centerY = screenHeight - 150
-    local radius = 40
-    local thickness = 8
+    local barY = screenHeight - 120
+    local barX = centerX - barWidth / 2
 
-    local currentTime = GetGameTimer() or 0
-    local elapsedTime = 0
-    if Menu.LoadingStartTime then
-        elapsedTime = currentTime - Menu.LoadingStartTime
-    end
-
-    local loadingText = ""
-    if elapsedTime < 1000 then
-        loadingText = "Injecting"
-    elseif elapsedTime < 2000 then
-        loadingText = "Have Fun !"
-    else
-        loadingText = "Have Fun !"
-    end
-
-    if loadingText ~= "" then
-        local textSize = 18
-        local textWidth = 0
-        if Susano and Susano.GetTextWidth then
-            textWidth = Susano.GetTextWidth(loadingText, textSize)
-        else
-            textWidth = string.len(loadingText) * 10
-        end
-        local textX = centerX - (textWidth / 2)
-        local textY = centerY - radius - 40
-        Menu.DrawText(textX, textY, loadingText, textSize, 1.0, 1.0, 1.0, 1.0 * alpha)
-    end
-
-    local segments = 90
-    local step = 360 / segments
-    local startAngle = -90
-
-    for i = 0, segments do
-        local angle = math.rad(startAngle + (i * step))
-        local px = centerX + radius * math.cos(angle)
-        local py = centerY + radius * math.sin(angle)
-        local outlineSize = thickness + 4
-        
-        if Susano and Susano.DrawRectFilled then
-            Susano.DrawRectFilled(px - outlineSize/2, py - outlineSize/2, outlineSize, outlineSize, 0.0, 0.0, 0.0, 1.0 * alpha, outlineSize/2)
-        else
-            Menu.DrawRect(px - outlineSize/2, py - outlineSize/2, outlineSize, outlineSize, 0, 0, 0, 255 * alpha)
-        end
-    end
-
-    for i = 0, segments do
-        local angle = math.rad(startAngle + (i * step))
-        local px = centerX + radius * math.cos(angle)
-        local py = centerY + radius * math.sin(angle)
-        
-        if Susano and Susano.DrawRectFilled then
-            Susano.DrawRectFilled(px - thickness/2, py - thickness/2, thickness, thickness, 0.15, 0.15, 0.15, 1.0 * alpha, thickness/2)
-        else
-            Menu.DrawRect(px - thickness/2, py - thickness/2, thickness, thickness, 38, 38, 38, 255 * alpha)
-        end
-    end
-
-    local progressSegments = math.floor(segments * (Menu.LoadingProgress / 100.0))
-    local accentR = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.r) and (Menu.Colors.SelectedBg.r / 255.0) or 1.0
-    local accentG = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.g) and (Menu.Colors.SelectedBg.g / 255.0) or 0.0
-    local accentB = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.b) and (Menu.Colors.SelectedBg.b / 255.0) or 1.0
-
-    for i = 0, progressSegments do
-        local angle = math.rad(startAngle + (i * step))
-        local px = centerX + radius * math.cos(angle)
-        local py = centerY + radius * math.sin(angle)
-        
-        if Susano and Susano.DrawRectFilled then
-            Susano.DrawRectFilled(px - thickness/2, py - thickness/2, thickness + 1, thickness + 1, accentR, accentG, accentB, 1.0 * alpha, (thickness + 1)/2)
-        else
-            Menu.DrawRect(px - thickness/2, py - thickness/2, thickness + 1, thickness + 1, accentR * 255, accentG * 255, accentB * 255, 255 * alpha)
-        end
-    end
-
-    local percentText = string.format("%.0f%%", Menu.LoadingProgress)
-    local percentTextSize = 16
-    local percentTextWidth = 0
+    -- "Phantom.Lua" basligi
+    local titleText = "Phantom.Lua"
+    local titleSize = 24
+    local titleWidth = 0
     if Susano and Susano.GetTextWidth then
-        percentTextWidth = Susano.GetTextWidth(percentText, percentTextSize)
+        titleWidth = Susano.GetTextWidth(titleText, titleSize)
     else
-        percentTextWidth = string.len(percentText) * 9
+        titleWidth = string.len(titleText) * 14
     end
-    local percentTextX = centerX - (percentTextWidth / 2)
-    local percentTextY = centerY - (percentTextSize / 2)
-    Menu.DrawText(percentTextX, percentTextY, percentText, percentTextSize, 1.0, 1.0, 1.0, 1.0 * alpha)
+    local titleX = centerX - titleWidth / 2
+    local titleY = barY - 40
+
+    -- Golge
+    Menu.DrawText(titleX + 1, titleY + 1, titleText, titleSize, 0.0, 0.0, 0.0, 0.7 * alpha)
+    Menu.DrawText(titleX, titleY, titleText, titleSize, 1.0, 1.0, 1.0, 1.0 * alpha)
+
+    -- Bar arkaplan (koyu gri)
+    if Susano and Susano.DrawRectFilled then
+        Susano.DrawRectFilled(barX, barY, barWidth, barHeight, 0.15, 0.15, 0.15, 0.8 * alpha, 3)
+    else
+        Menu.DrawRect(barX, barY, barWidth, barHeight, 38, 38, 38, math.floor(200 * alpha))
+    end
+
+    -- Ilerleme cubugu (kirmizi/turuncu gradient - fotodaki gibi)
+    local progress = Menu.LoadingProgress / 100.0
+    local progressWidth = barWidth * progress
+
+    if progressWidth > 0 then
+        if Susano and Susano.DrawRectGradient then
+            -- Soldan saga: kirmizi -> turuncu gradient
+            Susano.DrawRectGradient(barX, barY, progressWidth, barHeight,
+                0.85, 0.15, 0.1, 1.0 * alpha,
+                0.95, 0.35, 0.1, 1.0 * alpha,
+                0.95, 0.35, 0.1, 1.0 * alpha,
+                0.85, 0.15, 0.1, 1.0 * alpha,
+                3)
+        elseif Susano and Susano.DrawRectFilled then
+            Susano.DrawRectFilled(barX, barY, progressWidth, barHeight, 0.9, 0.25, 0.1, 1.0 * alpha, 3)
+        else
+            Menu.DrawRect(barX, barY, progressWidth, barHeight, 230, 64, 25, math.floor(255 * alpha))
+        end
+    end
+
+    -- "Loading...XX%" yazisi
+    local percentText = string.format("Loading...%.0f%%", Menu.LoadingProgress)
+    local percentSize = 14
+    local percentWidth = 0
+    if Susano and Susano.GetTextWidth then
+        percentWidth = Susano.GetTextWidth(percentText, percentSize)
+    else
+        percentWidth = string.len(percentText) * 8
+    end
+    local percentX = centerX - percentWidth / 2
+    local percentY = barY + barHeight + 8
+
+    Menu.DrawText(percentX + 1, percentY + 1, percentText, percentSize, 0.0, 0.0, 0.0, 0.5 * alpha)
+    Menu.DrawText(percentX, percentY, percentText, percentSize, 0.85, 0.85, 0.85, 0.9 * alpha)
 end
 
 function Menu.DrawFooter()
@@ -1482,81 +1455,84 @@ function Menu.DrawKeySelector(alpha)
         screenHeight = Susano.GetScreenHeight()
     end
 
-    local padding = 15
-    local cornerRadius = 8
-    local barHeight = 4
-    local lineHeight = 28
-    local textSize = 14
-    local headerHeight = 42
-
-    local width = 400
+    local width = 420
+    local rowHeight = 32
+    local cursorRowHeight = 26
+    local totalHeight = rowHeight + cursorRowHeight
     local startX = math.floor((screenWidth - width) / 2)
-    local startY = math.floor(screenHeight - 160)
+    local startY = math.floor(screenHeight - 100)
 
-    local itemName = Menu.BindingItem and (Menu.BindingItem.name or "Option") or "Menu Toggle"
+    -- Tema rengi
+    local accentR = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.r) and (Menu.Colors.SelectedBg.r / 255.0) or 0.3
+    local accentG = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.g) and (Menu.Colors.SelectedBg.g / 255.0) or 0.5
+    local accentB = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.b) and (Menu.Colors.SelectedBg.b / 255.0) or 1.0
+
+    -- Ust satir: koyu arkaplan
+    if Susano and Susano.DrawRectFilled then
+        Susano.DrawRectFilled(startX, startY, width, rowHeight, 0.1, 0.1, 0.1, 0.9 * alpha, 0)
+    else
+        Menu.DrawRect(startX, startY, width, rowHeight, 25, 25, 25, math.floor(230 * alpha))
+    end
+
+    -- Ucgen ikonu (fotodaki gibi - sol taraf)
+    local iconX = startX + 14
+    local iconY = startY + rowHeight / 2
+    if Susano and Susano.DrawCircle then
+        Susano.DrawCircle(iconX, iconY, 6, false, 0.8, 0.8, 0.8, 0.9 * alpha, 1.5, 3)
+    else
+        Menu.DrawText(startX + 8, startY + 8, "^", 14, 0.8, 0.8, 0.8, 0.9 * alpha)
+    end
+
+    -- "Select a keybind (Open key)" yazisi
+    local itemName = Menu.BindingItem and (Menu.BindingItem.name or "Option") or "Open key"
+    local selectText = "Select a keybind (" .. itemName .. ")"
+    local textSize = 14
+    local textX = startX + 30
+    local textY = startY + rowHeight / 2 - 7
+    Menu.DrawText(textX, textY, selectText, textSize, 1.0, 1.0, 1.0, 1.0 * alpha)
+
+    -- Ince mavi alt cizgi (fotodaki gibi)
+    if Susano and Susano.DrawRectFilled then
+        Susano.DrawRectFilled(startX, startY + rowHeight - 1, width, 1, accentR, accentG, accentB, 0.8 * alpha, 0)
+    else
+        Menu.DrawRect(startX, startY + rowHeight - 1, width, 1, math.floor(accentR*255), math.floor(accentG*255), math.floor(accentB*255), math.floor(200 * alpha))
+    end
+
+    -- Alt satir: cursor alani (daha koyu)
+    local cursorY = startY + rowHeight
+    if Susano and Susano.DrawRectFilled then
+        Susano.DrawRectFilled(startX, cursorY, width, cursorRowHeight, 0.05, 0.05, 0.05, 0.9 * alpha, 0)
+    else
+        Menu.DrawRect(startX, cursorY, width, cursorRowHeight, 12, 12, 12, math.floor(230 * alpha))
+    end
+
+    -- Yanip sonen cursor (|) - fotodaki gibi
+    local cursorBlink = 1.0
+    if GetGameTimer then
+        local t = GetGameTimer() % 1000
+        cursorBlink = t < 500 and 1.0 or 0.0
+    end
+
     local keyName = Menu.BindingItem and Menu.BindingKeyName or Menu.SelectedKeyName
-    if not keyName then keyName = "..." end
-    local status = "press a key"
-    local rowText = itemName .. " [" .. keyName .. "] - " .. status
+    if not keyName then keyName = "" end
 
-    local totalHeight = headerHeight + barHeight + padding + lineHeight + padding
-
-    local menuR = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.r) and (Menu.Colors.SelectedBg.r / 255.0) or 0.4
-    local menuG = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.g) and (Menu.Colors.SelectedBg.g / 255.0) or 0.2
-    local menuB = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.b) and (Menu.Colors.SelectedBg.b / 255.0) or 0.8
-
-    local bgAlpha = 0.65 * alpha
-    if Susano and Susano.DrawRectFilled then
-        Susano.DrawRectFilled(startX, startY, width, totalHeight, 0.0, 0.0, 0.0, bgAlpha, cornerRadius)
-    else
-        Menu.DrawRoundedRect(startX, startY, width, totalHeight, 0, 0, 0, math.floor(255 * bgAlpha), cornerRadius)
+    -- Cursor cizgisi
+    local cursorTextX = startX + 10
+    local cursorTextY = cursorY + 6
+    if keyName ~= "" and keyName ~= "..." then
+        Menu.DrawText(cursorTextX, cursorTextY, keyName, 13, 1.0, 1.0, 1.0, 1.0 * alpha)
+        local keyW = Susano and Susano.GetTextWidth and Susano.GetTextWidth(keyName, 13) or (string.len(keyName) * 8)
+        cursorTextX = cursorTextX + keyW + 2
     end
 
-    local title = "KEYBIND"
-    local titleX = startX + padding
-    local titleY = startY + padding - 2
-    Menu.DrawText(titleX - 1, titleY - 1, title, textSize, 0.0, 0.0, 0.0, 1.0 * alpha)
-    Menu.DrawText(titleX + 1, titleY - 1, title, textSize, 0.0, 0.0, 0.0, 1.0 * alpha)
-    Menu.DrawText(titleX - 1, titleY + 1, title, textSize, 0.0, 0.0, 0.0, 1.0 * alpha)
-    Menu.DrawText(titleX + 1, titleY + 1, title, textSize, 0.0, 0.0, 0.0, 1.0 * alpha)
-    Menu.DrawText(titleX, titleY, title, textSize, 1.0, 1.0, 1.0, 1.0 * alpha)
-
-    local barY = startY + headerHeight
-    local barLabel = "Choose a key"
-    local barLabelSize = 12
-    local barLabelW = Susano and Susano.GetTextWidth and Susano.GetTextWidth(barLabel, barLabelSize) or (string.len(barLabel) * 7)
-    local barLabelX = startX + (width / 2) - (barLabelW / 2)
-    local barLabelY = barY - barLabelSize - 4
-    Menu.DrawText(barLabelX, barLabelY, barLabel, barLabelSize, 0.9, 0.9, 0.9, 1.0 * alpha)
-
-    if Susano and Susano.DrawRectFilled then
-        Susano.DrawRectFilled(startX + padding, barY, width - 2 * padding, barHeight, menuR, menuG, menuB, 1.0 * alpha, 0)
-    else
-        Menu.DrawRect(startX + padding, barY, width - 2 * padding, barHeight, math.floor(menuR * 255), math.floor(menuG * 255), math.floor(menuB * 255), math.floor(255 * alpha))
+    -- Yanip sonen | cursor
+    if cursorBlink > 0 then
+        if Susano and Susano.DrawRectFilled then
+            Susano.DrawRectFilled(cursorTextX, cursorTextY, 1, 14, 1.0, 1.0, 1.0, 0.8 * alpha * cursorBlink, 0)
+        else
+            Menu.DrawRect(cursorTextX, cursorTextY, 1, 14, 255, 255, 255, math.floor(200 * alpha * cursorBlink))
+        end
     end
-
-    local rowY = barY + barHeight + padding
-    local textX = startX + padding
-    local textY = rowY + (lineHeight / 2) - (textSize / 2)
-
-    Menu.DrawText(textX - 1, textY - 1, rowText, textSize, 0.0, 0.0, 0.0, 1.0 * alpha)
-    Menu.DrawText(textX + 1, textY - 1, rowText, textSize, 0.0, 0.0, 0.0, 1.0 * alpha)
-    Menu.DrawText(textX - 1, textY + 1, rowText, textSize, 0.0, 0.0, 0.0, 1.0 * alpha)
-    Menu.DrawText(textX + 1, textY + 1, rowText, textSize, 0.0, 0.0, 0.0, 1.0 * alpha)
-    Menu.DrawText(textX, textY, rowText, textSize, 1.0, 1.0, 1.0, 1.0 * alpha)
-
-    local boxSize = 34
-    local boxX = startX + width - padding - boxSize
-    local boxY = rowY + (lineHeight / 2) - (boxSize / 2)
-    if Susano and Susano.DrawRectFilled then
-        Susano.DrawRectFilled(boxX, boxY, boxSize, boxSize, 0.12, 0.12, 0.12, 1.0 * alpha, 6)
-    else
-        Menu.DrawRect(boxX, boxY, boxSize, boxSize, 30, 30, 30, 255 * alpha)
-    end
-
-    local keySize = 18
-    local keyW = Susano and Susano.GetTextWidth and Susano.GetTextWidth(keyName, keySize) or (string.len(keyName) * 9)
-    Menu.DrawText(math.floor(boxX + (boxSize / 2) - (keyW / 2)), math.floor(boxY + (boxSize / 2) - (keySize / 2)), keyName, keySize, 1.0, 1.0, 1.0, 1.0 * alpha)
 end
 
 function Menu.DrawKeybindsInterface(alpha)
@@ -2018,6 +1994,9 @@ function Menu.Render()
         if not success then
         end
     end
+
+    -- Notifylari her zaman ciz (menu acik/kapali farketmez)
+    Menu.DrawNotifications()
 
     if Susano.SubmitFrame then
         Susano.SubmitFrame()
@@ -2917,6 +2896,120 @@ end
 
 if Menu.Banner.enabled and Menu.Banner.imageUrl then
     Menu.LoadBannerTexture(Menu.Banner.imageUrl)
+end
+
+-- ==========================================
+-- NOTIFICATION SISTEMI
+-- ==========================================
+Menu.Notifications = {}
+Menu.NotifyDuration = 3000 -- varsayilan sure (ms)
+
+function Menu.Notify(title, subtitle, duration)
+    table.insert(Menu.Notifications, {
+        title = title or "Notification",
+        subtitle = subtitle or "",
+        duration = duration or Menu.NotifyDuration,
+        startTime = GetGameTimer and GetGameTimer() or 0,
+        alpha = 0.0
+    })
+end
+
+function Menu.DrawNotifications()
+    if not Menu.Notifications or #Menu.Notifications == 0 then return end
+    
+    local screenWidth = 1920
+    local screenHeight = 1080
+    if Susano and Susano.GetScreenWidth and Susano.GetScreenHeight then
+        screenWidth = Susano.GetScreenWidth()
+        screenHeight = Susano.GetScreenHeight()
+    end
+    
+    local currentTime = GetGameTimer and GetGameTimer() or 0
+    local notifyWidth = 280
+    local notifyHeight = 50
+    local padding = 10
+    local cornerRadius = 6
+    local spacing = 8
+    local startX = screenWidth - notifyWidth - 20
+    local startY = 20
+    
+    local toRemove = {}
+    
+    for i, notif in ipairs(Menu.Notifications) do
+        local elapsed = currentTime - notif.startTime
+        local fadeInTime = 300
+        local fadeOutTime = 500
+        
+        -- Alpha hesapla (fade-in / goruntuleme / fade-out)
+        if elapsed < fadeInTime then
+            notif.alpha = elapsed / fadeInTime
+        elseif elapsed < notif.duration - fadeOutTime then
+            notif.alpha = 1.0
+        elseif elapsed < notif.duration then
+            notif.alpha = 1.0 - ((elapsed - (notif.duration - fadeOutTime)) / fadeOutTime)
+        else
+            notif.alpha = 0.0
+            table.insert(toRemove, i)
+        end
+        
+        if notif.alpha > 0 then
+            local ny = startY + (i - 1) * (notifyHeight + spacing)
+            local alpha = notif.alpha
+            
+            -- Koyu yari seffaf arkaplan (fotodaki gibi)
+            if Susano and Susano.DrawRectFilled then
+                Susano.DrawRectFilled(startX, ny, notifyWidth, notifyHeight,
+                    0.1, 0.1, 0.1, 0.85 * alpha, cornerRadius)
+            else
+                Menu.DrawRoundedRect(startX, ny, notifyWidth, notifyHeight,
+                    25, 25, 25, math.floor(220 * alpha), cornerRadius)
+            end
+            
+            -- Mavi kisi ikonu (fotodaki gibi)
+            local iconX = startX + padding + 14
+            local iconY = ny + notifyHeight / 2
+            local iconRadius = 12
+            
+            local accentR = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.r) and (Menu.Colors.SelectedBg.r / 255.0) or 0.3
+            local accentG = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.g) and (Menu.Colors.SelectedBg.g / 255.0) or 0.5
+            local accentB = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.b) and (Menu.Colors.SelectedBg.b / 255.0) or 1.0
+            
+            -- Ikon arka plan dairesi
+            if Susano and Susano.DrawCircle then
+                Susano.DrawCircle(iconX, iconY, iconRadius, true, accentR, accentG, accentB, 0.9 * alpha, 1.0, 32)
+            end
+            
+            -- Kisi silüeti - kafa (kucuk daire)
+            if Susano and Susano.DrawCircle then
+                Susano.DrawCircle(iconX, iconY - 4, 3.5, true, 0.15, 0.15, 0.15, 0.95 * alpha, 1.0, 16)
+            end
+            -- Kisi silüeti - govde (yari daire/oval)
+            if Susano and Susano.DrawRectFilled then
+                Susano.DrawRectFilled(iconX - 5, iconY + 2, 10, 6, 0.15, 0.15, 0.15, 0.95 * alpha, 3)
+            end
+            
+            -- Baslik yazisi
+            local textX = startX + padding + iconRadius * 2 + padding + 4
+            local titleY = ny + 10
+            local subtitleY = ny + 28
+            
+            if Susano and Susano.DrawText then
+                Susano.DrawText(textX, titleY, notif.title, 15, 1.0, 1.0, 1.0, 1.0 * alpha)
+            end
+            
+            -- Alt yazi
+            if notif.subtitle and notif.subtitle ~= "" then
+                if Susano and Susano.DrawText then
+                    Susano.DrawText(textX, subtitleY, notif.subtitle, 12, 0.6, 0.6, 0.6, 0.85 * alpha)
+                end
+            end
+        end
+    end
+    
+    -- Suresi dolan notifylari sil (sondan basa)
+    for i = #toRemove, 1, -1 do
+        table.remove(Menu.Notifications, toRemove[i])
+    end
 end
 
 
