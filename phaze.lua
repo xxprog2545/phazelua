@@ -1280,7 +1280,7 @@ function Menu.DrawLoadingBar(alpha)
     local barWidth = 300
     local barHeight = 8
     local centerX = screenWidth / 2
-    local barY = screenHeight - 120
+    local barY = screenHeight / 2
     local barX = centerX - barWidth / 2
 
     -- "Phantom.Lua" basligi
@@ -1460,7 +1460,7 @@ function Menu.DrawKeySelector(alpha)
     local cursorRowHeight = 26
     local totalHeight = rowHeight + cursorRowHeight
     local startX = math.floor((screenWidth - width) / 2)
-    local startY = math.floor(screenHeight - 100)
+    local startY = math.floor(screenHeight / 2 + 80)
 
     -- Tema rengi
     local accentR = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.r) and (Menu.Colors.SelectedBg.r / 255.0) or 0.3
