@@ -1280,7 +1280,7 @@ function Menu.DrawLoadingBar(alpha)
     local barWidth = 300
     local barHeight = 8
     local centerX = screenWidth / 2
-    local barY = screenHeight / 2
+    local barY = screenHeight / 2 - barHeight / 2
     local barX = centerX - barWidth / 2
 
     -- "Phantom.Lua" basligi
@@ -1306,23 +1306,23 @@ function Menu.DrawLoadingBar(alpha)
         Menu.DrawRect(barX, barY, barWidth, barHeight, 38, 38, 38, math.floor(200 * alpha))
     end
 
-    -- Ilerleme cubugu (kirmizi/turuncu gradient - fotodaki gibi)
+    -- Ilerleme cubugu (mor/purple gradient)
     local progress = Menu.LoadingProgress / 100.0
     local progressWidth = barWidth * progress
 
     if progressWidth > 0 then
         if Susano and Susano.DrawRectGradient then
-            -- Soldan saga: kirmizi -> turuncu gradient
+            -- Soldan saga: mor gradient
             Susano.DrawRectGradient(barX, barY, progressWidth, barHeight,
-                0.85, 0.15, 0.1, 1.0 * alpha,
-                0.95, 0.35, 0.1, 1.0 * alpha,
-                0.95, 0.35, 0.1, 1.0 * alpha,
-                0.85, 0.15, 0.1, 1.0 * alpha,
+                0.55, 0.1, 0.85, 1.0 * alpha,
+                0.7, 0.2, 0.95, 1.0 * alpha,
+                0.7, 0.2, 0.95, 1.0 * alpha,
+                0.55, 0.1, 0.85, 1.0 * alpha,
                 3)
         elseif Susano and Susano.DrawRectFilled then
-            Susano.DrawRectFilled(barX, barY, progressWidth, barHeight, 0.9, 0.25, 0.1, 1.0 * alpha, 3)
+            Susano.DrawRectFilled(barX, barY, progressWidth, barHeight, 0.6, 0.15, 0.85, 1.0 * alpha, 3)
         else
-            Menu.DrawRect(barX, barY, progressWidth, barHeight, 230, 64, 25, math.floor(255 * alpha))
+            Menu.DrawRect(barX, barY, progressWidth, barHeight, 153, 38, 217, math.floor(255 * alpha))
         end
     end
 
@@ -1455,12 +1455,12 @@ function Menu.DrawKeySelector(alpha)
         screenHeight = Susano.GetScreenHeight()
     end
 
-    local width = 420
-    local rowHeight = 32
-    local cursorRowHeight = 26
+    local width = 480
+    local rowHeight = 38
+    local cursorRowHeight = 32
     local totalHeight = rowHeight + cursorRowHeight
     local startX = math.floor((screenWidth - width) / 2)
-    local startY = math.floor(screenHeight / 2 + 80)
+    local startY = math.floor(screenHeight / 2 + 60)
 
     -- Tema rengi
     local accentR = (Menu.Colors.SelectedBg and Menu.Colors.SelectedBg.r) and (Menu.Colors.SelectedBg.r / 255.0) or 0.3
